@@ -2,6 +2,7 @@ const router = require('express').Router();
 const User = require('../models/User');
 const Joi = require('@hapi/joi');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const validateSchema = Joi.object({
     name:Joi.string().min(6).required(),
@@ -51,6 +52,9 @@ router.post('/login',async (req,res)=>{
     const passControl = await bcrypt.compare(req.body.password, user.password);
 
     if(!passControl) return res.status(400).send("User not found");
+
+    const token = jwt.sign({_id:user._id},process.env.TOKEN_SECRET);
+    res.header('auth-token',token).send(token)
 
     res.send('You can login');
 });

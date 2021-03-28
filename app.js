@@ -15,8 +15,11 @@ mongoose
 
 const authRoute = require('./routes/auth');
 
+const postRoute = require('./routes/posts');
+
 app.use(express.json());
 app.use('/api/user',authRoute);
+app.use('/api/post',postRoute);
 
 
 app.listen(process.env.PORT, () => console.log(`Port listening`));
