@@ -9,6 +9,11 @@ const validateSchema = Joi.object({
     password:Joi.string().min(6).required(),
 });
 
+const validateLoginSchema = Joi.object({
+    email:Joi.string().min(6).required().email(),
+    password:Joi.string().min(6).required(),
+});
+
 // /api/user/register
 router.post('/register',async (req,res)=>{
 
@@ -34,6 +39,20 @@ router.post('/register',async (req,res)=>{
     }catch(err){
         console.log(err);
     };
+});
+
+router.post('/login',async (req,res)=>{
+    const {error} = validateLoginSchema.validate(req.body);
+    if(error) return res.status(400).send(error.details[0].message);
+
+    const user = await User.findOne({email:req.body.email});
+    if(!user) res.status(400).send('User not found');
+
+    const passControl = await bcrypt.compare(req.body.password, user.password);
+
+    if(!passControl) return res.status(400).send("User not found");
+
+    res.send('You can login');
 });
 
 module.exports = router;
